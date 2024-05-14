@@ -3,11 +3,9 @@
  import java.util.Collection;
  import java.util.HashSet;
  import java.util.Set;
- import java.util.stream.Collectors;
 
  import com.example.demo.models.Authority;
  import org.springframework.security.core.GrantedAuthority;
- import org.springframework.security.core.authority.SimpleGrantedAuthority;
  import org.springframework.security.core.userdetails.UserDetails;
 
  import com.example.demo.models.User;
