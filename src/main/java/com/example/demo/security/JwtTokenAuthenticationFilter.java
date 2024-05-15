@@ -15,16 +15,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 @Service
-public class TokenFilter  extends OncePerRequestFilter{
+public class JwtTokenAuthenticationFilter  extends OncePerRequestFilter{
     
     @Autowired
-    private TokenProvider tokenProvider;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        var token = request.getHeader("Authorization");
-        var authorization = tokenProvider.parse(token);
+        var authorization = jwtTokenProvider.authenticate(request.getHeader("Authorization"));
+
 
         if (null != authorization && authorization.isAuthenticated()) {
 

@@ -1,13 +1,12 @@
 package com.example.demo.controller;
 
+
+import com.example.demo.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.models.Role;
-import com.example.demo.models.User;
-import com.example.demo.models.UserRole;
 import com.example.demo.service.UserService;
 
 import java.util.HashSet;
@@ -20,6 +19,7 @@ public class UserController {
     
     @Autowired  
     private UserService userService;
+
 
     
     @PostMapping
@@ -54,4 +54,6 @@ public class UserController {
     public void deleteUserById(@PathVariable("id") Long id){
         userService.deleteUser(id);
     }
+
+
 }

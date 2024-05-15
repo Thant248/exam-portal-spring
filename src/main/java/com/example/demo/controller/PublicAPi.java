@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.models.LoginForm;
-import com.example.demo.models.LoginResult;
+import com.example.demo.dto.LoginForm;
+import com.example.demo.dto.LoginResult;
 import com.example.demo.security.TokenProvider;
 
 @RestController

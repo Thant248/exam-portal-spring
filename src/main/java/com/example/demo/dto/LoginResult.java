@@ -1,4 +1,4 @@
-package com.example.demo.models;
+package com.example.demo.dto;
 
 public record LoginResult(
     boolean success, String message
