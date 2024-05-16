@@ -6,12 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,58 +16,63 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtTokenProvider {
 
-    private  final Key secrectKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+	private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
+	@Value("${com.jdc.jwt.issuer}")
+	private String issuer;
 
-    @Value("${com.jdc.jwt.issuer}")
-    private  String issuer;
+	@Value("${com.jdc.jwt.expiration}")
+	private int expireAt;
+	
+	private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    @Value("${com.jdc.jwt.expiration}")
-    private int expireAt;
+	public Authentication authenticate(String token) {
 
+		try {
+			if (StringUtils.hasLength(token)) {
+				var jws = Jwts.parserBuilder().requireIssuer(issuer).setSigningKey(secretKey).build()
+						.parseClaimsJws(token);
 
-    private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+				var username = jws.getBody().getSubject();
+				var authoritieString = jws.getBody().get("roles").toString();
+				var authorities = Arrays.stream(authoritieString.split(",")).map(a -> new SimpleGrantedAuthority(a))
+						.toList();
 
-    public Authentication authenticate(String token){
-        try {
-            if (StringUtils.hasLength(token)){
-                var jws = Jwts.parserBuilder().requireIssuer(issuer).setSigningKey(secrectKey).build()
-                        .parseClaimsJws(token.substring("Bearer ".length()));
-                var username = jws.getBody().getSubject();
-                var authoritiesString = jws.getBody().get("roles").toString();
-                var authorities = Arrays.stream(authoritiesString.split(",")).map(a -> new SimpleGrantedAuthority(a)).toList();
-                return UsernamePasswordAuthenticationToken.authenticated(username, null, authorities);
+				return UsernamePasswordAuthenticationToken.authenticated(username, null, authorities);
+			}
+		} catch (Exception e) {
+			logger.info("Invalid Token : %s".formatted(e.getMessage()));
+		}
 
+		return null;
+	}
 
-            }
-        }catch (Exception e){
+	public String generate(Authentication authentication) {
 
-            logger.info("Invalid Token : %s".formatted(e.getMessage()));
-        }
+		if (null != authentication && authentication.isAuthenticated()
+				&& !(authentication instanceof AnonymousAuthenticationToken)) {
 
-        return null;
-    }
+			var now = new Date();
+			var calendar = Calendar.getInstance();
+			calendar.setTime(now);
+			calendar.add(Calendar.MINUTE, expireAt);
 
-    public String generate(Authentication authentication){
-        if (null != authentication && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+			var jwtToken = Jwts.builder().setIssuer(issuer).setIssuedAt(now).setExpiration(calendar.getTime())
+					.setSubject(authentication.getName()).claim("roles", authentication.getAuthorities().stream()
+							.map(a -> a.getAuthority()).collect(Collectors.joining(",")))
+					.signWith(secretKey).compact();
 
-            var now = new Date();
-            var calendar = Calendar.getInstance();
+			return "%s".formatted(jwtToken);
+		}
 
-            calendar.setTime(now);
-            calendar.add(Calendar.MINUTE, expireAt);
+		return null;
+	}
 
-            var jwtToken = Jwts.builder().setIssuer(issuer).setIssuedAt(now).setExpiration(calendar.getTime())
-                            .setSubject(authentication.getName()).claim("roles", authentication.getAuthorities()
-                            .stream().map(a -> a.getAuthority()).collect(Collectors.joining(","))).signWith(secrectKey).compact();
-
-            return "Bearer %s".formatted(jwtToken);
-        }
-        return null;
-    }
-    
 }
