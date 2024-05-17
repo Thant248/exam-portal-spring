@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.model.entity.Category;
 import com.example.demo.model.repo.CategoryRepo;
 import com.example.demo.model.service.CategoryService;
-import com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {

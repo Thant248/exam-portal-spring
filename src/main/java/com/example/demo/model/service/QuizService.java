@@ -1,5 +1,6 @@
 package com.example.demo.model.service;
 
+import com.example.demo.model.entity.Category;
 import com.example.demo.model.entity.Quiz;
 
 import java.util.List;
@@ -17,4 +18,10 @@ public interface QuizService {
     public Quiz getQuizByid(Long quizId);
 
     public void deleteQuizById(Long quizId);
+
+    public List<Quiz> getQuizzesOfCategory(Category category);
+    
+    public List<Quiz> getActiveQuizzes();
+
+    public List<Quiz> getActiveQuizzesOFCategory(Category category);
 }

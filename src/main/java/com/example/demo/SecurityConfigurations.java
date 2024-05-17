@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import org.aspectj.weaver.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +50,8 @@ public class SecurityConfigurations {
 			request.requestMatchers("/admin/**").hasAuthority("Admin");
 			request.requestMatchers("/member/**").hasAuthority("Member");
 			request.requestMatchers("/category/**").permitAll();
+			request.requestMatchers("/quiz/**").permitAll();
+			request.requestMatchers("/question/**").permitAll();
 			request.anyRequest().denyAll();
 		});
 		

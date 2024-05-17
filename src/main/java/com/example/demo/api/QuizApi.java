@@ -48,9 +48,8 @@ public class QuizApi {
 
 
     //delete quiz
-    @DeleteMapping("/{qid}")
-    public  String deleteQuiz(@PathVariable("qid") Long qid){
-        
+    @DeleteMapping("/{quizid}")
+    public  String deleteQuiz(@PathVariable("quizid") Long qid){
          quizService.deleteQuizById(qid);
          return "Quiz has been deleted";
     }

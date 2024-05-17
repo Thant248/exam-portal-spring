@@ -40,7 +40,6 @@ public class Quiz {
     private boolean active  = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
     private Category category;
 
     @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
