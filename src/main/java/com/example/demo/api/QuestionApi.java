@@ -17,10 +17,11 @@ import com.example.demo.model.entity.Quiz;
 import com.example.demo.model.service.QuestionService;
 import com.example.demo.model.service.QuizService;
 
+import jakarta.persistence.QueryTimeoutException;
+
 import java.util.List;
 import java.util.Set;
 import java.util.*;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -87,6 +88,33 @@ public class QuestionApi {
         Category category = new Category();
         category.setCid(cid);
         return  quizService.getActiveQuizzesOFCategory(category);
+    }
+
+
+
+    //eval quiz mark
+    @PostMapping("/eval-quiz")
+    public ResponseEntity<?> evalQuiz(@RequestBody List<Question> questions){
+        double marksGot = 0;
+        int correctAnswers = 0;
+        int attempted = 0;
+        for(Question q : questions) {
+            //single questions 
+          Question question =  questionService.get(q.getId());
+          if (question.getAnswer().trim().equals(q.getGivenAnswers().trim())) {
+            //correct
+            correctAnswers++;
+            double markSingle =  Double.parseDouble(questions.get(0).getQuiz().getMaxMarks()) / questions.size();
+            marksGot += markSingle;
+
+          }
+          if (q.getGivenAnswers().trim().equals("") || q.getGivenAnswers() != null)  {  
+            attempted++;
+          }
+
+        };
+        Map<String, Object> map = Map.of("marksGot", marksGot, "correctAnswers", correctAnswers);
+        return ResponseEntity.ok(map);
     }
 
 
